@@ -13,7 +13,7 @@ const HomePage = () => {
 
   const handleClick = (hijriYear) => {
     localStorage.setItem('hijriYear', hijriYear);
-    navigate('/zakat-fitrah');
+    navigate('/stats');
   };
 
   return (

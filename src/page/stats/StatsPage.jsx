@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import supabase from '../../utils/supabaseClient';
+import NavbarComp from '../../components/NavbarComp';
 
 const StatsPage = () => {
   const hijriYear = localStorage.getItem('hijriYear');
@@ -8,7 +9,7 @@ const StatsPage = () => {
   const [jumlahTotals, setJumlahTotals] = useState({});
   const [uangTotal, setUangTotal] = useState(0);
   const [mustahikStats, setMustahikStats] = useState({});
-  const [muzakkiStats, setMuzakkiStats] = useState({}); // State untuk muzakki berdasarkan alamat
+  const [muzakkiStats, setMuzakkiStats] = useState({});
   const [muzakkiCount, setMuzakkiCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,24 +110,27 @@ const StatsPage = () => {
   if (error) return <div>Error: {error.message || error.toString()}</div>;
 
   return (
+    <div className='flex flex-row w-screen h-screen'>
+        <NavbarComp/>
     <div>
       <h2>Statistik Data {hijriYear}</h2>
       <ul>
-        <li>Total jumlah fitrah, maal, dan fidyah: {jumlahTotals.fitrah + jumlahTotals.maal + jumlahTotals.fidyah}</li>
-        <li>Total jumlah fitrah: {jumlahTotals.fitrahTotal}</li>
-        <li>Total jumlah maal: {jumlahTotals.maalTotal}</li>
-        <li>Total jumlah fidyah: {jumlahTotals.fidyahTotal}</li>
+        <li>Total Beras: {jumlahTotals.fitrah + jumlahTotals.maal + jumlahTotals.fidyah} Kg</li>
+        <li>Zakat Fitrah: {jumlahTotals.fitrahTotal} Kg</li>
+        <li>Zakat Maal {jumlahTotals.maalTotal} Kg</li>
+        <li>Zakat Fidyah: {jumlahTotals.fidyahTotal} Kg</li>
         <li>Total muzakki: {muzakkiCount}</li>
-        <li>Muzakki alamat Derpoyudan: {muzakkiStats.derpoyudan}</li>
-        <li>Muzakki alamat Kauman: {muzakkiStats.kauman}</li>
-        <li>Muzakki alamat Sorobayan: {muzakkiStats.sorobayan}</li>
+        <li>Muzakki Derpoyudan: {muzakkiStats.derpoyudan}</li>
+        <li>Muzakki Kauman: {muzakkiStats.kauman}</li>
+        <li>Muzakki Sorobayan: {muzakkiStats.sorobayan}</li>
         <li>Total mustahik: {mustahikStats.total}</li>
-        <li>Mustahik alamat Derpoyudan: {mustahikStats.derpoyudan}</li>
-        <li>Mustahik alamat Kauman: {mustahikStats.kauman}</li>
-        <li>Mustahik alamat Sorobayan: {mustahikStats.sorobayan}</li>
-        <li>Mustahik alamat lain: {mustahikStats.lain}</li>
-        <li>Total uang infaq: {uangTotal}</li>
+        <li>Mustahik Derpoyudan: {mustahikStats.derpoyudan}</li>
+        <li>Mustahik Kauman: {mustahikStats.kauman}</li>
+        <li>Mustahik Sorobayan: {mustahikStats.sorobayan}</li>
+        <li>Mustahik lain: {mustahikStats.lain}</li>
+        <li>Total uang infaq: Rp.{uangTotal}</li>
       </ul>
+    </div>
     </div>
   );
 };
