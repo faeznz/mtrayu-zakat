@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../../../utils/supabaseClient";
 import NavbarComp from "../../../components/NavbarComp";
+import { FaSpinner, FaTrash } from "react-icons/fa";
 
 const ZakatFitrahPage = () => {
     const hijriYear = localStorage.getItem("hijriYear");
     const tableName = `${hijriYear}_fitrah`;
-
     const [data, setData] = useState();
     const [formData, setFormData] = useState({
         nama: "",
@@ -15,6 +15,7 @@ const ZakatFitrahPage = () => {
         uang: "",
     });
     const [formError, setFormError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
         try {
@@ -23,6 +24,7 @@ const ZakatFitrahPage = () => {
                 console.error("Error fetching data:", error);
             } else {
                 setData(data);
+                setLoading(false);
             }
         } catch (error) {
             console.error("Unexpected error fetching data:", error);
@@ -52,7 +54,6 @@ const ZakatFitrahPage = () => {
             setFormError("Uang harus berupa angka.");
             return;
         }
-        // Ganti nilai kosong dengan 0
         const formDataToSend = {
             ...formData,
             jumlah: formData.jumlah ? formData.jumlah : "0",
@@ -64,6 +65,7 @@ const ZakatFitrahPage = () => {
             if (error) {
                 console.error("Error inserting data:", error);
             } else {
+                setLoading(true);
                 fetchData();
                 setFormData({
                     nama: "",
@@ -78,6 +80,20 @@ const ZakatFitrahPage = () => {
         }
     };
 
+    const handleDelete = async (id) => {
+        try {
+            const { error } = await supabase.from(tableName).delete().eq("id", id);
+            if (error) {
+                console.error("Error deleting data:", error);
+            } else {
+                setLoading(true);
+                fetchData();
+            }
+        } catch (error) {
+            console.error("Unexpected error deleting data:", error);
+        }
+    };
+
     useEffect(() => {
         fetchData();
     },);
@@ -86,8 +102,8 @@ const ZakatFitrahPage = () => {
         <div className="flex flex-row w-screen h-screen">
             <NavbarComp />
             <div className="w-full p-12 text-xl text-[#2C368B]">
-                <div class="flex mb-4">
-                    <div class="w-full bg-[#2C368B] text-white font-extrabold h-24 rounded-2xl flex justify-center items-center text-3xl">Zakat Fitrah Masjid Trayu {hijriYear} H</div>
+                <div className="flex mb-4">
+                    <div className="w-full bg-[#2C368B] text-white font-extrabold h-24 rounded-2xl flex justify-center items-center text-3xl">Zakat Fitrah Masjid Trayu {hijriYear} H</div>
                 </div>
 
                 <div className="flex flex-row">
@@ -149,30 +165,43 @@ const ZakatFitrahPage = () => {
                     </form>
 
                     <div className="w-1/2 p-8 overflow-y-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th>Alamat</th>
-                                    <th>Jiwa</th>
-                                    <th>Jumlah</th>
-                                    <th>Uang</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data?.map((item, index) => ( 
-                                    <tr key={index}>
-                                        <td>{index + 1}</td> 
-                                        <td>{item.nama}</td>
-                                        <td>{item.alamat}</td>
-                                        <td>{item.jiwa}</td>
-                                        <td>{item.jumlah}</td>
-                                        <td>{item.uang}</td>
+                        {loading ? (
+                            <div className="flex flex-col justify-center items-center h-full">
+                                <FaSpinner className="animate-spin text-4xl text-[#2C368B]" />
+                                <p className="mt-4">Memuat data...</p>
+                            </div>
+                        ) : (
+                            <table className="w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="py-4">No</th>
+                                        <th>Nama</th>
+                                        <th>Alamat</th>
+                                        <th>Jiwa</th>
+                                        <th>Jumlah</th>
+                                        <th>Uang</th>
+                                        <th></th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {data?.map((item, index) => (
+                                        <tr key={item.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{item.nama}</td>
+                                            <td>{item.alamat}</td>
+                                            <td>{item.jiwa}</td>
+                                            <td>{item.jumlah}</td>
+                                            <td>{item.uang}</td>
+                                            <td>
+                                                <button onClick={() => handleDelete(item.id)} className="text-red-600">
+                                                    <FaTrash />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 </div>
             </div>
